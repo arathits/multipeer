@@ -1,3 +1,5 @@
+docker-compose up -d
+
 docker exec -e "CORE_PEER_LOCALMSPID=SupplychainMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@supplychainorg.project.com/msp" administrator peer channel create -o orderer.project.com:7050 -c supplychannel -f /etc/hyperledger/configtx/channel.tx
 
 docker cp administrator:/opt/gopath/src/github.com/hyperledger/fabric/peer/supplychannel.block .
@@ -39,11 +41,11 @@ docker cp supplychain.1.0 distributer1:/var/hyperledger/production/chaincodes/su
 docker cp supplychain.1.0 distributer2:/var/hyperledger/production/chaincodes/supplychain.1.0
 
 echo "***********************************************CHAINCODE INVOKE***********************************************"
-sleep 3
+
 docker exec -e "CORE_PEER_ADDRESS=administrator.supplychainorg.project.com:7051" -e "CORE_PEER_LOCALMSPID=SupplychainMSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/supplychainorg.project.com/users/Admin@supplychainorg.project.com/msp" cli peer chaincode invoke -o orderer.project.com:7050 -C supplychannel -n supplychain -c '{"function":"initLedger","Args":[""]}'
-sleep 3
+
 docker exec -e "CORE_PEER_ADDRESS=supplier.supplychainorg.project.com:7051" -e "CORE_PEER_LOCALMSPID=SupplychainMSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/supplychainorg.project.com/users/Admin@supplychainorg.project.com/msp" cli peer chaincode invoke -o orderer.project.com:7050 -C supplychannel -n supplychain -c '{"function":"initLedger","Args":[""]}'
-sleep 3
+
 docker exec -e "CORE_PEER_ADDRESS=distributer1.supplychainorg.project.com:7051" -e "CORE_PEER_LOCALMSPID=SupplychainMSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/supplychainorg.project.com/users/Admin@supplychainorg.project.com/msp" cli peer chaincode invoke -o orderer.project.com:7050 -C supplychannel -n supplychain -c '{"function":"initLedger","Args":[""]}'
-sleep 3
+
 docker exec -e "CORE_PEER_ADDRESS=distributer2.supplychainorg.project.com:7051" -e "CORE_PEER_LOCALMSPID=SupplychainMSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/supplychainorg.project.com/users/Admin@supplychainorg.project.com/msp" cli peer chaincode invoke -o orderer.project.com:7050 -C supplychannel -n supplychain -c '{"function":"initLedger","Args":[""]}'
