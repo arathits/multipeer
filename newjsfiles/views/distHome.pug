@@ -1,0 +1,86 @@
+html
+  head
+    style
+      include main.css
+      include tab.css
+      include verticaltab.css
+      include table.css
+    script
+      include tabchange.js
+    script(type="text/javascript").
+      document.getElementById("queryproduct").click();
+  body
+    .tab
+      label.tablinks=uname
+      form(style='height:auto' method='GET' action='/logout')
+        button.tablinks(style='float:right') Logout
+
+    .vtab(style='height:100%')
+      button.tablinks#que(onclick="openTab(event, 'queryproduct')" class='active') Query Products
+      button.tablinks#trp(onclick="openTab(event, 'transferproduct')") Transfer Product
+      button.tablinks#gth(onclick="openTab(event, 'gethistory')") Get History
+
+
+    #queryproduct.tabcontent(style='display:block; margin-top:5px')
+      - var arr = [];
+      - var arr2 = [];
+      - arr = queryresult.split(".");
+      div(style='overflow-x:auto;margin-top:10px;margin-left:10px;')
+        table
+          thead
+            tr(style='background-color: #4CAF50;color: white')
+              th Product Id
+              th Type
+              th Name
+              th Quantity
+              th Owner
+              th Current Owner
+              th Address
+          tbody
+            - for (var i = 0; i < arr.length-1; i++)
+              - arr2 = arr[i].split(" ");
+              tr
+                th
+                  label=arr2[1]
+                th
+                  label=arr2[2]
+                th
+                  label=arr2[3]
+                th
+                  label=arr2[4]
+                th
+                  label=arr2[5]
+                th
+                  label=arr2[6]
+                th
+                  - var addr = '';
+                  - for (var j=7; j<arr2.length; j++)
+                    - addr = addr + arr2[j];
+                  label=addr
+
+
+    #transferproduct.tabcontent(style='margin-top:10px;margin-left:40px')
+      form(style='width:100%' method='GET' class="modal-content animate" action='/transferProduct')
+        input#tname.form-control(type='hidden' value=uname name='uname')
+        div.form-group(align='center')
+          label(for='tid' style='padding:0px 69px 0px 0px') Product Id
+          input#tid.form-control(type='text' placeholder='product id' name='tid' required="required"  pattern='[0-9]+' title="Product Id should be a number")
+        div.form-group(align='center')
+          label(for='tqty' style='padding:0px 82px 0px 0px') Quantity
+          input#tqty.form-control(type='number' placeholder='quantity' name='tqty' required="required")
+        div.form-group(align='center')
+          label(for='rname' style='padding:0px 78px 0px 0px') Receiver
+          input#rname.form-control(type='text' placeholder='receiver name' name='rname')
+        div.form-group(align='center')
+          label(for='rloc' style='padding:0px 15px 0px 0px') Receiver Address
+          input#rloc.form-control(type='text' placeholder='receiver address' name='rloc' required="required"  pattern='[^\.]+' title="Address should not contain dots(.)")
+        div.form-group(align='center')
+          button#transfer(type='submit' style='width:90%') Submit
+
+    #gethistory.tabcontent(style='margin-top:30px')
+      form(style='width:65%' method='GET' class="modal-content animate" action='/getHistory')
+        input#gname.form-control(type='hidden' value=uname name='uname')
+        div.form-group(align='center')
+          label(for='gid' style='padding:0px 10px 0px 0px') Product Id
+          input#gid.form-control(type='text' placeholder='product id' name='gid')
+          button#transfer(type='submit' style='width:90%') Submit

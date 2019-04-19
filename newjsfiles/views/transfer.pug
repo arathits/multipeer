@@ -1,0 +1,36 @@
+html
+  head
+    style
+      include main.css
+      include tab.css
+      include verticaltab.css
+    style(type="text/css").
+      div {
+        width: 100%;
+        display: inline-block;
+        box-sizing: border-box;
+        background-color: #4CAF50;
+        color: white;
+      }
+  body
+    .tab
+      label.tablinks=uname
+      form(style='height:auto' method='GET' action='/logout')
+        input#username.form-control(type='hidden' value=uname name='username')
+        button.tablinks(style='float:right') Logout
+        button.tablinks(type='submit' style='float:right' formaction='/login') Home
+
+    form(style='width:90%' class="modal-content animate")
+      label(style='margin: 8px 0;padding: 12px 20px') Transfer successful ... Details of transfer
+      div.form-group(style='margin: 8px 0;padding: 12px 20px')
+        label(style='padding:0px 69px 0px 0px') Product Id:
+        label=pid
+      div.form-group(style='margin: 8px 0;padding: 12px 20px')
+        label(style='padding:0px 82px 0px 0px') Quantity:
+        label=pqty
+      div.form-group(style='margin:8px 0; padding: 12px 20px')
+        label(style='padding:0px 78px 0px 0px') Receiver:
+        label=rname
+      div.form-group(style='margin:8px 0; padding: 12px 20px')
+        label(style='padding:0px 15px 0px 0px') Receiver Address:
+        label=rloc

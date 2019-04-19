@@ -1,0 +1,43 @@
+Profiles:
+  SupplychainOrdererGenesis:
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+          - *SupplychainOrg
+  SupplychainChannel:
+    Consortium: SampleConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *SupplychainOrg
+
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/project.com/msp
+  - &SupplychainOrg
+    Name: SupplychainOrg
+    ID: SupplychainMSP
+    MSPDir: crypto-config/peerOrganizations/supplychainorg.project.com/msp
+    AnchorPeers:
+      - Host: administrator.supplychainorg.project.com
+        Port: 7051
+
+Application: &ApplicationDefaults
+  Organizations:
+
+Orderer: &OrdererDefaults
+  OrdererType: solo
+  Addresses:
+    - orderer.project.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    PreferredMaxBytes: 512 KB
+    AbsoluteMaxBytes: 99 MB
+  Organizations:

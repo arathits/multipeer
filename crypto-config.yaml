@@ -1,0 +1,13 @@
+OrdererOrgs:
+- Name: Orderer
+  Domain: project.com
+  Specs:
+  - Hostname: orderer
+PeerOrgs:
+- Name: SupplyChainOrg
+  Domain: supplychainorg.project.com
+  Specs:
+  - Hostname: administrator
+  - Hostname: supplier
+  - Hostname: distributer1
+  - Hostname: distributer2

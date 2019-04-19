@@ -1,0 +1,43 @@
+html
+  head
+    style
+      include main.css
+      include tab.css
+    script
+      include tabchange.js
+    script(type="text/javascript").
+      document.getElementById("login").click();
+  body
+    h1(align='center') Disaster Management
+
+    .tab
+      button.tablinks(onclick="openTab(event, 'login')" class='active') Login
+      button.tablinks(onclick="openTab(event, 'register')") Register
+
+    h3(align='center')=regresult
+
+    #login.tabcontent(style='display:block')
+      table(style='width:80%' align='center')
+        tr
+          th
+            form(method='GET' class="modal-content animate" action='/login')
+              div.form-group
+                label(for='username' style='padding:0px 5px 0px 0px') Username:
+                input#username.form-control(type='text' placeholder='username' name='username')
+              div.form-group
+                label(for='password' style='padding:0px 6px 0px 0px') Password:
+                input#password.form-control(type='password' placeholder='password' name='password')
+              button#log(type='submit') Login
+
+    #register.tabcontent
+      table(style='width:80%' align='center')
+        tr
+          th
+            form(method='GET' class="modal-content animate" action='/register')
+              div.form-group
+                label(for='regname' style='padding:0px 5px 0px 0px') Username:
+                input#regname.form-control(type='text' placeholder='username' name='regname')
+              div.form-group
+                label(for='regpass' style='padding:0px 6px 0px 0px') Password:
+                input#regpass.form-control(type='password' placeholder='password' name='regpass')
+              button#reg(type='submit') Register
