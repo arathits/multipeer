@@ -43,7 +43,7 @@ app.get('/getHistory', function(request, response){
 });
 
 app.get('/getBlockHeight', function(request, response){
-  blk.func(request.query.uname, response);
+  blk.func(request.query.uname, user, response);
 });
 
 /*app.get('/transferProduct', function(request, response){

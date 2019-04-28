@@ -37,4 +37,8 @@ app.get('/transferProduct', function(request, response){
   trp.func(request.query.uname, request.query.tid, request.query.rname, request.query.tqty, request.query.rloc, user, response);
 });
 
+app.get('/getBlockHeight', function(request, response){
+  blk.func(request.query.uname, user, response);
+});
+
 app.listen(3060, () => console.log('Running on a localhost:3060'));

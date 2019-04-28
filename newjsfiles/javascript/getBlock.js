@@ -1,4 +1,4 @@
-function blks(uname,bid1) {
+function blks(uname,bid1,utype) {
 console.log("hello ");
 'use-strict';
 var Fabric_Client = require('fabric-client');
@@ -9,12 +9,21 @@ var os = require('os');
 var fabric_client = new Fabric_Client();
 
 var user_name = uname;
+var user_type = utype;
 var bid=bid1;
 console.log("process.argv = " + user_name);
 
 // setup the fabric network
 var channel = fabric_client.newChannel('supplychannel');
-var peer = fabric_client.newPeer('grpc://localhost:7051');
+var peer;
+if (user_type == 'supplier'){
+	peer = fabric_client.newPeer('grpc://localhost:8051');
+} else if (user_type == 'distributer'){
+	peer = fabric_client.newPeer('grpc://localhost:7056');
+} else if (user_type == 'admin'){
+	peer = fabric_client.newPeer('grpc://localhost:7051');
+}
+
 channel.addPeer(peer);
 
 //
@@ -60,7 +69,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			console.log("Data Hash : ", block.header.data_hash);
 			console.log('Transactions: ' + block.data.data.length);
 			var str = "Block Number : " + block.header.number.toString()+"<br>Previous Hash: "+block.header.previous_hash.toString()+"<br>Data Hash : "+block.header.data_hash.toString()+"<br>Transactions:"+ block.data.data.length.toString();
-			document.getElementById('myPopup').innerHTML="Hello";
+			
 			return str;
   			/*block.data.data.forEach(transaction => {
 				console.log('Transaction ID: ' + transaction.payload.header.channel_header.tx_id);
@@ -76,3 +85,4 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	console.error('Failed to query successfully :: ' + err);
 })
 }
+

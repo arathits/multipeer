@@ -23,23 +23,26 @@
 }
 
 .popup p {
-  
+
 }
 
 /* The actual popup */
 .popup .popuptext {
   visibility: hidden;
-  width: 160px;
+  height: 120px;
+  width: 700px;
   background-color: #555;
   color: #fff;
   text-align: center;
-  border-radius: 6px;
+  border-radius: 25px;
   padding: 8px 0;
   position: absolute;
   z-index: 1;
   bottom: 125%;
-  left: 50%;
+  left: -350%;
   margin-left: -80px;
+  font-size: 15px;
+  line-height: 20px;
 }
 
 /* Popup arrow */
@@ -71,3 +74,4 @@
   from {opacity: 0;}
   to {opacity:1 ;}
 }
+

@@ -27,14 +27,13 @@ console.log("process.argv = " + supname1);
 var channel = fabric_client.newChannel('supplychannel');
 
 var peer;
-if (user_type == 'supplier'){
+if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
-} else if (user_type == 'distributer'){
+} else if (user_type == 'supplier'){
 	peer = fabric_client.newPeer('grpc://localhost:7056');
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-
 channel.addPeer(peer);
 
 //

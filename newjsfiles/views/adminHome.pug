@@ -22,6 +22,9 @@ html
       button.tablinks#inv(onclick="openTab(event, 'createproduct')") Create Product
       button.tablinks#trp(onclick="openTab(event, 'transferproduct')") Transfer Product
       button.tablinks#gth(onclick="openTab(event, 'gethistory')") Get History
+      form(method='GET' action='/getBlockHeight')
+        input#uname.form-control(type='hidden' value=uname name='uname')
+        button.tablinks#blk Block Explorer
 
 
     #queryall.tabcontent(style='display:block; margin-top:5px')

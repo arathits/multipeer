@@ -33,16 +33,16 @@ app.get('/invoke', function(request, response){
   inv.func(request.query.sname, request.query.ptype, request.query.pname, request.query.pqty, request.query.ploc, user, response);
 });
 
-/*app.get('/query', function(request, response){
-  que.func(request.query.uname,response);
-});*/
-
 app.get('/getHistory', function(request, response){
   gth.func(request.query.uname, request.query.gid, user, response);
 });
 
 app.get('/transferProduct', function(request, response){
   trp.func(request.query.uname, request.query.tid, request.query.rname, request.query.tqty, request.query.rloc, user, response);
+});
+
+app.get('/getBlockHeight', function(request, response){
+  blk.func(request.query.uname, user, response);
 });
 
 app.listen(3030, () => console.log('Running on a localhost:3030'));

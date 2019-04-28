@@ -7,11 +7,11 @@ html
       include popup.css
     script
       include tabchange.js
-      include ../javascript/getBlock.js
+      
 
     script.
       function abcd(a,b) {
-        document.getElementById("myPopup"+b).innerHTML="hello "+b;
+        document.getElementById("myPopup"+b).innerHTML=a;
         var popup = document.getElementById("myPopup"+b);
         popup.classList.toggle("show");
       }
@@ -24,13 +24,17 @@ html
         button.tablinks(style='float:right') Logout
         button.tablinks(type='submit' style='float:right' formaction='/login') Home
 
-
-    div(style='padding: 30px 10px 10px 10px;overflow-x:auto;width:90%;margin:0 auto')
+    div(class="scroll" style={'margin-left':'180px'})
+      - var arr = [];
+      - arr = strs.split(",");
       - for (var i = 0; i < height; i++)
           - as = "myPopup"+i;
           form(class="square")
             h1(style={color: 'white', 'font-size': '20px'})
               div(class="popup")
-                p(onclick='abcd(' + '"' + uname + '"' + ',' + '"' + i + '"' + ')') Block
+                p(onclick='abcd(' + '"' + arr[i] + '"' + ',' + '"' + i + '"' + ')') Block
+                  label()
                   label=i
-                  span(id=as).popuptext
+                  span(id=as).popuptext 
+
+
