@@ -25,6 +25,8 @@ html
       label=arr2[1]
       label(style='padding:0px 10px 0px 10px') ,Quantity:
       label=arr2[2]
+      label(style='padding:0px 10px 0px 10px') ,Location:
+      label=arr2[3]
       - for (var i = 2; i < arr.length-1; i++)
         - if(arr[i][0]==pid)
           <br/>
@@ -38,3 +40,8 @@ html
           label=arr2[1]
           label(style='padding:0px 10px 0px 10px') ,Quantity:
           label=arr2[2]
+          label(style='padding:0px 10px 0px 10px') ,Location:
+          - var str = '';
+          - for (var k = 3; k < arr2.length; k++)
+            - str=str+arr2[k];
+          label=str

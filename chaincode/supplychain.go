@@ -15,7 +15,7 @@ type SmartContract struct {
 
 type Product struct {
 	Id string `json:"id"`
-	PrevId string `json:"previd"`
+	NextId string `json:"nextid"`
 	Type   string `json:"type"`
 	Name  string `json:"name"`
 	Quantity string `json:"quantity"`
@@ -43,10 +43,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.queryAllProducts(APIstub)
 	} else if function=="queryByOwner" {
 		return s.queryByOwner(APIstub,args)
-	} else if function=="transferProductNew" {
-		return s.transferProductNew(APIstub,args)
-	} else if function=="getHistoryByKeyNew" {
-		return s.getHistoryByKeyNew(APIstub,args)
+	} else if function=="transferProduct" {
+		return s.transferProduct(APIstub,args)
+	} else if function=="getHistoryByKey" {
+		return s.getHistoryByKey(APIstub,args)
 	}
 	return shim.Error("Invalid Smart Contract function name.")
 }
@@ -58,7 +58,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 
 	id := "0"
 
-	product := Product{Id: "0", PrevId: "", Type: "", Name: "1", Quantity: "", Owner: "", CurrentOwner: "", Location: ""}
+	product := Product{Id: "0", NextId: "", Type: "", Name: "1", Quantity: "", Owner: "", CurrentOwner: "", Location: ""}
 	productAsBytes, _ := json.Marshal(product);
 	APIstub.PutState(id,productAsBytes)
 
@@ -106,7 +106,7 @@ func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args 
 	err := json.Unmarshal(lastProductAsBytes, &lastProduct)
 	lastPid := lastProduct.Name
 
-	var product = Product{Id: lastPid, PrevId: id, Type: args[0], Name: args[1], Quantity: args[2], Owner: args[3], CurrentOwner: args[4], Location: args[5]}
+	var product = Product{Id: lastPid, NextId: id, Type: args[0], Name: args[1], Quantity: args[2], Owner: args[3], CurrentOwner: args[4], Location: args[5]}
 
 	productAsBytes, _ := json.Marshal(product)
 	APIstub.PutState(lastPid, productAsBytes)
@@ -269,7 +269,7 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 
 /****************************************TRANSFER PRODUCT****************************************/
 
-func (s *SmartContract) transferProductNew(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) transferProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 4 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
@@ -297,7 +297,7 @@ func (s *SmartContract) transferProductNew(APIstub shim.ChaincodeStubInterface, 
 		lastProductAsBytes, _ := APIstub.GetState("0")
 		lastProduct := Product{}
 		err = json.Unmarshal(lastProductAsBytes, &lastProduct)
-		transferProd.PrevId = lastProduct.Name
+		transferProd.NextId = lastProduct.Name
 
 		newQuantity := strconv.Itoa(currQuantity-transferQuantity)
 		transferProd.Quantity = newQuantity
@@ -327,7 +327,7 @@ func (s *SmartContract) transferProductNew(APIstub shim.ChaincodeStubInterface, 
 
 /****************************************GET PRODUCT HISTORY****************************************/
 
-func (s *SmartContract) getHistoryByKeyNew(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) getHistoryByKey(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -351,20 +351,19 @@ func (s *SmartContract) getHistoryByKeyNew(APIstub shim.ChaincodeStubInterface, 
 		if err != nil {
 			return shim.Error(err.Error())
 		}
-		//b.WriteString("Id: ")
+
 		b.WriteString(string(p.Id))
 		b.WriteString(" ")
-		//b.WriteString("CurrentOwner: ")
 		b.WriteString(string(p.CurrentOwner))
 		b.WriteString(" ")
-		//b.WriteString("Quantity: ")
 		b.WriteString(string(p.Quantity))
-		//b.WriteString(" ")
+		b.WriteString(" ")
+		b.WriteString(string(p.Location))
 		b.WriteString("/")
 
-		prev := p.PrevId
+		prev := p.NextId
 		if prev != "0" {
-			response := s.getHistoryByKeyNew(APIstub,[]string{prev})
+			response := s.getHistoryByKey(APIstub,[]string{prev})
 			if response.Status != shim.OK {
 					return shim.Error("Transfer failed: " + response.Message)
 			}

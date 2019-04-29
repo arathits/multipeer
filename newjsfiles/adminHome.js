@@ -3,11 +3,10 @@ var app = express();
 var path =require('path')
 var reg = require('./javascript/registerUser')
 var inv = require('./javascript/invoke');
-//var que = require('./javascript/query');
 var trp = require('./javascript/transferProduct');
 var gth = require('./javascript/getHistory');
 var qall = require('./javascript/queryAll');
-//var qs = require('querystring');
+var blk = require('./javascript/getBlockHeight');
 
 var user = "admin";
 
@@ -17,7 +16,6 @@ app.get('/', function(req, res){
 
 app.get("/register", function(req, res) {
   reg.func(req.query.regname,res);
-  //res.redirect('/');
   res.render('home.pug',{regresult: "Registration Successfull ... Login to Proceed"});
 });
 

@@ -76,7 +76,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	var request = {
 		//targets: let default to the peer assigned to the client
 		chaincodeId: 'supplychain',
-		fcn: 'transferProductNew',
+		fcn: 'transferProduct',
 		args: [pid,quantity,new_owner,new_loc],
 		chainId: 'supplychannel',
 		txId: tx_id

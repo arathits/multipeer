@@ -7,7 +7,7 @@ html
       include popup.css
     script
       include tabchange.js
-      
+
 
     script.
       function abcd(a,b) {
@@ -16,7 +16,7 @@ html
         popup.classList.toggle("show");
       }
 
-  body
+  body(style='overflow-x:hidden;overflow-y:hidden')
     .tab
       label.tablinks=uname
       form(style='height:auto' method='GET' action='/logout')
@@ -24,7 +24,7 @@ html
         button.tablinks(style='float:right') Logout
         button.tablinks(type='submit' style='float:right' formaction='/login') Home
 
-    div(class="scroll" style={'margin-left':'180px'})
+    div(style='padding-top:10%;overflow-x:scroll')
       - var arr = [];
       - arr = strs.split(",");
       - for (var i = 0; i < height; i++)
@@ -35,6 +35,4 @@ html
                 p(onclick='abcd(' + '"' + arr[i] + '"' + ',' + '"' + i + '"' + ')') Block
                   label()
                   label=i
-                  span(id=as).popuptext 
-
-
+                  span(id=as).popuptext
