@@ -1,5 +1,5 @@
 module.exports={
-func:function(username11,response){
+func:function(username11,pwd11,response){
 'use strict';
 var Fabric_Client = require('fabric-client');
 var Fabric_CA_Client = require('fabric-ca-client');
@@ -7,6 +7,8 @@ var Fabric_CA_Client = require('fabric-ca-client');
 var path = require('path');
 var util = require('util');
 var os = require('os');
+const fs = require('fs');
+var sha = require('js-sha256');
 
 var fabric_client = new Fabric_Client();
 var fabric_ca_client = null;
@@ -18,6 +20,7 @@ var store_path = path.join(__dirname, '../../hfc-key-store');
 console.log(' Store path:'+store_path);
 
 var user_name = username11;
+var password = sha.sha256(pwd11);
 //console.log("<br>process.argv = " + process.argv[2]+ '<br>');
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -73,6 +76,11 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 }).then(()=>{
      console.log(user_name+' was successfully registered and enrolled and is ready to interact with the fabric network');
      var str = user_name+' was successfully registered';
+	 
+	 fs.appendFileSync('login.txt', user_name+" "+password+"\r\n");
+
+     console.log("Login credentials saved to file!");
+
      //response.end("Supplier "+user_name+" registered")
      //response.render('home.pug',{result: str});
      //return user_name;
