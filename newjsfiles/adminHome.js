@@ -19,6 +19,23 @@ app.get("/register", function(req, res) {
   res.render('home.pug',{regresult: "Registration Successfull ... Login to Proceed"});
 });
 
+app.get('/loginauth', function(req, res){
+	var sha = require('js-sha256');
+    var lineReader = require('readline').createInterface({
+  			input: require('fs').createReadStream('login.txt')
+	});
+	
+	var pwd = sha.sha256(req.query.password);
+	lineReader.on('line', function (line) {
+	
+  	str=line.split(" ");
+  	if(str[0]==req.query.username && str[1]==pwd)
+	{	console.log("login successful");	
+		qall.func(req.query.username,user,res);
+	}
+	});
+});
+
 app.get('/login', function(req, res){
    qall.func(req.query.username, user, res);
 });

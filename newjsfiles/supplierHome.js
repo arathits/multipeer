@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var path =require('path')
-var sha = require('js-sha256');
+
 var reg = require('./javascript/registerUser')
 var inv = require('./javascript/invoke');
 var que = require('./javascript/query');
@@ -19,8 +19,9 @@ app.get("/register", function(req, res) {
   res.render('home.pug',{regresult: "Registration Successfull ... Login to Proceed"});
 });
 
-app.get('/login', function(req, res){
-   var lineReader = require('readline').createInterface({
+app.get('/loginauth', function(req, res){
+	var sha = require('js-sha256');
+    var lineReader = require('readline').createInterface({
   			input: require('fs').createReadStream('login.txt')
 	});
 	
@@ -34,6 +35,11 @@ app.get('/login', function(req, res){
 	}
 	});
 });
+
+app.get('/login', function(req, res){
+   que.func(req.query.username,user,res);
+});
+
 
 app.get('/logout', function(req, res){
    res.redirect('/');
