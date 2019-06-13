@@ -15,7 +15,7 @@ app.get('/', function(req, res){
 });
 
 app.get("/register", function(req, res) {
-  reg.func(req.query.regname,res);
+  reg.func(req.query.regname,req.query.regpass,res);
   res.render('home.pug',{regresult: "Registration Successfull ... Login to Proceed"});
 });
 
