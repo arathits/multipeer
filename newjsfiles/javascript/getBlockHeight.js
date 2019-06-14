@@ -3,7 +3,7 @@ module.exports={
 func:function func(uname, utype, response){
 
 'use strict';
-	
+
 //load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
@@ -11,14 +11,14 @@ var util = require('util');
 var os = require('os');
 
 var promises = [];
-var str=" "; 
+var str=" ";
 var arr = [];
 var hgt;
 var fabric_client = new Fabric_Client();
 
 var user_type = utype;
 var user_name = uname;
-console.log("process.argv = " + user_name);
+console.log("Username = " + user_name);
 
 // setup the fabric network
 //create a channel object
@@ -77,34 +77,32 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			console.log('Block Height='+blockinfo.height.low);
 			hgt = blockinfo.height.low.toString();
 			arr.length=hgt;
-			
+
 			var i;
-			//loop through array of promises, to call a function 
+			//loop through array of promises, to call a local function named getBlock()
 			for(i=0;i<hgt;i++)
-			{	
+			{
   				promises.push(getBlock(i));
 			}
-			console.log(arr);	
-			
+			console.log(arr);
+
 			//when all promises are resolved
 			Promise.all(promises)
     		.then(() => {
 				console.log(arr);
 				//render results to a pug file
-	        		response.render('dispblocks.pug',{uname: user_name, height: hgt, strs:arr.toString()});			
+	        		response.render('dispblocks.pug',{uname: user_name, height: hgt, strs:arr.toString()});
     		})
     		.catch((e) => {
         		console.log(err)
     		});
 		}
-	} 
+	}
 	else {
 		console.log("No payloads were returned from query");
 	}
 }).catch((err) => {
 	console.error('Failed to query successfully :: ' + err);
-	//response.writeHead(200, {'Content-Type': 'text/html'});
-	//response.write('Failed to get execute with this supplier.... run registerUser.js');
 })
 
 
@@ -113,16 +111,10 @@ var getBlock = function(bid){
 	return new Promise((resolve) => {
 	//query the ledger for Block details by block number.
 	channel.queryBlock(bid).then((block) => {
-		var ans = calculateBlockHash(block.header);
-		
-		/*console.log("Block : ", block.header.number);
-		console.log("==========");
-		console.log("Current Hash : ",ans);
-		console.log("Previous Hash: ", block.header.previous_hash);
-		console.log("Data Hash : ", block.header.data_hash);
-		console.log('Transactions: ' + block.data.data.length);*/
+		var ans = calculateBlockHash(block.header); //call to user-defined function calculateBlockHash
+
 		str = "Block Number : " + block.header.number.toString() + "<br>Current Hash : " + ans.toString()+"<br>Previous Hash: "+block.header.previous_hash.toString()+"<br>Data Hash : "+block.header.data_hash.toString()+"<br>Transactions:"+ block.data.data.length.toString();
-		
+
 		//append the details to array
 		arr[bid]=str;
 		console.log(bid);
@@ -131,35 +123,36 @@ var getBlock = function(bid){
 		console.log('Failed to send install proposal due to error: ' + err.stack ? err.stack : err);
 		throw new Error('Failed to send install proposal due to error: ' + err.stack ? err.stack : err);
 	});
-		setTimeout(() => {
-          console.log("Resolving " + bid);
-          resolve(bid);
-        }, 1000);
+	setTimeout(() => {
+    console.log("Resolving " + bid);
+    resolve(bid);
+  }, 1000);
 });
 }
 
 
-//function to get current block's hash
-//required modules
+//modules required to calculate hash
 var sha = require('js-sha256');
 var asn = require('asn1.js');
+//function to get current block's hash
 var calculateBlockHash = function(header) {
   let headerAsn = asn.define('headerAsn', function() {
+		//current hash is calculated from block number, previous block hash and current block's data hash
     this.seq().obj(
       this.key('Number').int(),
       this.key('PreviousHash').octstr(),
-     this.key('DataHash').octstr()
-   );
- });
-//find current block hash
+     	this.key('DataHash').octstr()
+   	);
+ 	});
+	//find current block hash
   let output = headerAsn.encode({
       Number: parseInt(header.number),
       PreviousHash: Buffer.from(header.previous_hash, 'hex'),
       DataHash: Buffer.from(header.data_hash, 'hex')
-    }, 'der');
+  }, 'der');
   let hash = sha.sha256(output);
   return hash;
 };
-}
-}
 
+}
+}

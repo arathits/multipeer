@@ -24,13 +24,13 @@ app.get('/loginauth', function(req, res){
     var lineReader = require('readline').createInterface({
   			input: require('fs').createReadStream('login.txt')
 	});
-	
+
 	var pwd = sha.sha256(req.query.password);
 	lineReader.on('line', function (line) {
-	
+
   	str=line.split(" ");
   	if(str[0]==req.query.username && str[1]==pwd)
-	{	console.log("login successful");	
+	{	console.log("Login successful");	
 		qall.func(req.query.username,user,res);
 	}
 	});

@@ -20,7 +20,8 @@ var fabric_client = new Fabric_Client();
 
 var user_name = uname;
 var user_type = utype;
-console.log("process.argv = " + user_name);
+console.log("Username = " + user_name);
+console.log("Usertype = " + user_type);
 
 // setup the fabric network
 var channel = fabric_client.newChannel('supplychannel');
