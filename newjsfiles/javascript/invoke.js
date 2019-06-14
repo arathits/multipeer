@@ -1,15 +1,8 @@
+//nodejs program to add products for a supplier
 module.exports={
 func:function(supname,ptype1,pname1,pqty1,ploc1,utype,response){
 'use strict';
-/*
-* Copyright IBM Corp All Rights Reserved
-*
-* SPDX-License-Identifier: Apache-2.0
-*/
-/*
- * Chaincode Invoke
- */
-
+//load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
@@ -22,13 +15,13 @@ var ptype = ptype1;
 var pname = pname1;
 var pqty = pqty1;
 var ploc = ploc1;
-//response.writeHead(200, {'Content-Type': 'text/html'});
+
 
 var fabric_client = new Fabric_Client();
-
+//create a channel object
 // setup the fabric network
 var channel = fabric_client.newChannel('supplychannel');
-
+//find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -37,7 +30,7 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-
+//add the peer object to the channel object
 channel.addPeer(peer);
 var order = fabric_client.newOrderer('grpc://localhost:7050')
 channel.addOrderer(order);
@@ -173,14 +166,9 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	}
 
 	if(results && results[1] && results[1].event_status === 'VALID') {
-	        /*console.log("###################################################################");
-	        console.log(results);
-	        console.log("###################################################################");
-	        console.log(results[1]);
-	        console.log("###################################################################");*/
-
+	
 		console.log('Successfully committed the change to the ledger by the peer');
-		//response.write("Products registered: <br>  Supplier: "+user_name+"<br>  Type: "+ptype+"<br>  Product: "+pname+"\n<br>  Quantity: "+pqty+"\n<br>  Location: "+ploc+"<br><br>     Product Id generated is ");
+		     Product Id generated is ");
 	} else {
 		console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
 	}
@@ -199,11 +187,9 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
+				//console display
 				console.log(query_responses[0].toString());
-				//response.writeHead(200, {'Content-Type': 'text/html'});
-				//response.end(query_responses[0].toString());
-				//var str = "Product registered: <br>  Supplier: "+user_name+"<br>  Type: "+ptype+"<br>  Product: "+pname+"\n<br>  Quantity: "+pqty+"\n<br>  Location: "+ploc+"<br><br>     Product Id generated is "+query_responses[0].toString();
-				//response.end(str);
+				//Display on web UI
 				response.render('invoke.pug',{pid:query_responses[0].toString(), uname: user_name, ptype: ptype, pname: pname, pqty: pqty, ploc: ploc});
 
 			}
