@@ -1,4 +1,4 @@
-//nodejs Program to get the history of a product by its id
+//nodejs function to get the history of a product by its id
 module.exports={
 func:function(supname1,pid1,utype,response){
 'use strict';
