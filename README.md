@@ -35,7 +35,8 @@
 
 ## **BLOCKCHAIN NETWORK SETUP AND RUNNING APPLICATION**
 
-The application development include 3 steps	
+The application development include 3 steps
+
 	1 Network setup
 	2 Chaincode development
 	3 Middleware development
