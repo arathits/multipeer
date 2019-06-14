@@ -1,6 +1,7 @@
 //nodejs function to query the product details by supplier name
 module.exports={
 func:function(uname, utype, response){
+
 //load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
@@ -27,11 +28,9 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
+
 //add the peer object to the channel object
 channel.addPeer(peer);
-//init the reponse on js file
-
-
 
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
@@ -62,15 +61,12 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	  response.write('Failed to get '+user_name+'.... run registerUser.js');
 	}
 
-	// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
-	// queryAllCars chaincode function - requires no arguments , ex: args: [''],
+	// creating request for retieving products details with current owner as user_name
 	const request = {
-		//targets : --- letting this default to the peers assigned to the channel
 		chaincodeId: 'supplychain',
 		fcn: 'queryByOwner',
 		args: [user_name],
 	};
-
 
 	// send the query proposal to the peer
 
@@ -87,7 +83,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			var arr2 = [];
 			arr = str.split(".");
 			for (var i = 0; i < arr.length-1; i++) {
-			        //displaying the details in console
+			  // displaying the details in console
 				arr2 = arr[i].split(" ");
 				console.log("\nItem no = "+arr2[0])
 				console.log("\tId = "+arr2[1]);

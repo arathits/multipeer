@@ -31,10 +31,7 @@ if (user_type == 'distributer'){
 }
 //add the peer object to the channel object
 channel.addPeer(peer);
-//init js file out
 
-
-//
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
 console.log('Store path:'+store_path);
@@ -64,15 +61,11 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		response.write('Failed to get '+user_name+'.... run registerUser.js');
 	}
 
-	// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
-	// queryAllCars chaincode function - requires no arguments , ex: args: [''],
 	const request = {
-		//targets : --- letting this default to the peers assigned to the channel
 		chaincodeId: 'supplychain',
 		fcn: 'queryAllProducts',
 		args: [''],
 	};
-
 
 	// send the query proposal to the peer
 
@@ -89,7 +82,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			var arr2 = [];
 			arr = str.split(".");
 			for (var i = 0; i < arr.length-1; i++) {
-			        //Displaying the results on console
+			  // Displaying the results on console
 				arr2 = arr[i].split(" ");
 				console.log("\tId = "+arr2[0]);
 				console.log("\tType = "+arr2[1]);
@@ -101,7 +94,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			}
 			//Displaying in web UI
 			response.render('adminHome.pug', {queryresult: str, uname: user_name, sname: user_name});
-			
+
 		}
 	} else {
 		console.log("No payloads were returned from query");
