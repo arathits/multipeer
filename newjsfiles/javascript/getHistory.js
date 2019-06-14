@@ -1,20 +1,14 @@
+//nodejs Program to get the history of a product by its id
 module.exports={
 func:function(supname1,pid1,utype,response){
 'use strict';
-/*
-* Copyright IBM Corp All Rights Reserved
-*
-* SPDX-License-Identifier: Apache-2.0
-*
-*
-* Chaincode query
-*/
 
+//load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 var os = require('os');
-//response.writeHead(200, {'Content-Type': 'text/html'});
+
 
 var fabric_client = new Fabric_Client();
 
@@ -24,8 +18,10 @@ var pid=pid1;
 console.log("process.argv = " + supname1);
 
 // setup the fabric network
+//create a channel object
 var channel = fabric_client.newChannel('supplychannel');
 
+//find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -34,9 +30,10 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
+//add the peer object to the channel object
 channel.addPeer(peer);
 
-//
+
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
 console.log('Store path:'+store_path);
@@ -64,8 +61,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		throw new Error('Failed to get '+user_name+'.... run registerUser.js');
 	}
 
-	// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
-	// queryAllCars chaincode function - requires no arguments , ex: args: [''],
+	// getHistoryByKey chaincode function - requires 1 integer argument
 	const request = {
 		//targets : --- letting this default to the peers assigned to the channel
 		chaincodeId: 'supplychain',
@@ -79,7 +75,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	return channel.queryByChaincode(request);
 }).then((query_responses) => {
 	console.log("Query has completed, checking results");
-	// query_responses could have more than one  results if there multiple peers were used as targets
+	// check whether query_responses have one  result and is not an error
 	if (query_responses && query_responses.length == 1) {
 		if (query_responses[0] instanceof Error) {
 			console.error("error from query = ", query_responses[0]);
@@ -87,6 +83,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			//history display
 			var str = pid+"/"+query_responses[0].toString();
 			console.log("Response is ", query_responses[0].toString());
+			//render output to the pug page
 			response.render('history.pug',{uname: user_name, historyresult: str});
 		}
 	} else {
