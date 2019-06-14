@@ -1,13 +1,8 @@
-'use strict';
-/*
-* Copyright IBM Corp All Rights Reserved
-*
-* SPDX-License-Identifier: Apache-2.0
-*/
-/*
- * Enroll the admin user
- */
+// to enroll an admin user; the admin user is assigned the privilege by ca to distribute tokens to users
 
+'use strict';
+
+// load required modules
 var Fabric_Client = require('fabric-client');
 var Fabric_CA_Client = require('fabric-ca-client');
 
@@ -15,13 +10,12 @@ var path = require('path');
 var util = require('util');
 var os = require('os');
 
-//
 var fabric_client = new Fabric_Client();
 var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
-console.log(' Store path:'+store_path);
+console.log('Store path:'+store_path);
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
 Fabric_Client.newDefaultKeyValueStore({ path: store_path
@@ -38,7 +32,6 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
     	trustedRoots: [],
     	verify: false
     };
-    // be sure to change the http to https when the CA is running TLS enabled
     fabric_ca_client = new Fabric_CA_Client('http://localhost:7054', tlsOptions , 'ca.project.com', crypto_suite);
 
     // first check to see if the admin is already enrolled
@@ -49,16 +42,16 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
         admin_user = user_from_store;
         return null;
     } else {
-        // need to enroll it with CA server
+        // need to enroll admin with CA server
         return fabric_ca_client.enroll({
           enrollmentID: 'admin',
           enrollmentSecret: 'adminpw'
         }).then((enrollment) => {
           console.log('Successfully enrolled admin user "admin"');
           return fabric_client.createUser(
-              {username: 'admin',
-                  mspid: 'SupplychainMSP',
-                  cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
+              { username: 'admin',
+                mspid: 'SupplychainMSP',
+                cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
               });
         }).then((user) => {
           admin_user = user;
