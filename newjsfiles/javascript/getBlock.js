@@ -1,6 +1,9 @@
+//nodejs function to get the block details given its id
 function blks(uname,bid1,utype) {
-console.log("hello ");
+
 'use-strict';
+
+//load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
@@ -14,7 +17,10 @@ var bid=bid1;
 console.log("process.argv = " + user_name);
 
 // setup the fabric network
+//create a channel object
 var channel = fabric_client.newChannel('supplychannel');
+	
+//find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'supplier'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -23,10 +29,11 @@ if (user_type == 'supplier'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-
+	
+//add the peer object to the channel object
 channel.addPeer(peer);
 
-//
+
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
 console.log('Store path:'+store_path);
@@ -55,7 +62,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	}
 
 
-	// send the query proposal to the peer
+	// query the ledger for Block by block number
 	return channel.queryBlock(parseInt(bid));
 }).then((block) => {
 	console.log("Query has completed, checking results");
@@ -64,6 +71,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		if (block[0] instanceof Error) {
 			console.error("error from query = ", block[0]);
 		} else {
+			//display block details in console and return the results as a string
 			console.log("Block Number : ", block.header.number);
 			console.log("Previous Hash: ", block.header.previous_hash);
 			console.log("Data Hash : ", block.header.data_hash);
