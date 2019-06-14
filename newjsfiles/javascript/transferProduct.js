@@ -168,7 +168,8 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	} else {
 		console.error('Failed to order the transaction. Error code: ' + results[0].status);
 	}
-
+	
+	//display result status to console
 	if(results && results[1] && results[1].event_status === 'VALID') {
 		console.log('Successfully committed the change to the ledger by the peer');
 	} else {
