@@ -1,9 +1,9 @@
-//nodejs function to query all product details and their owners
+// nodejs function to query all product details and their owners
 module.exports={
 func:function(uname, utype, response){
 'use strict';
 
-//load required modules
+// load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
@@ -18,9 +18,9 @@ console.log("Username = " + user_name);
 console.log("Usertype = " + user_type);
 
 // setup the fabric network
-//create a channel object
+// create a channel object
 var channel = fabric_client.newChannel('supplychannel');
-//find type of peer and return a peer object with appropriate url
+// find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -29,7 +29,7 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-//add the peer object to the channel object
+// add the peer object to the channel object
 channel.addPeer(peer);
 
 var member_user = null;
@@ -82,7 +82,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			var arr2 = [];
 			arr = str.split(".");
 			for (var i = 0; i < arr.length-1; i++) {
-			  // Displaying the results on console
+			  // displaying the results on console
 				arr2 = arr[i].split(" ");
 				console.log("\tId = "+arr2[0]);
 				console.log("\tType = "+arr2[1]);
@@ -92,7 +92,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 				console.log("\tCurrent Owner = "+arr2[5]);
 				console.log("\tAddress = "+arr2[6]);
 			}
-			//Displaying in web UI
+			// displaying in web UI
 			response.render('adminHome.pug', {queryresult: str, uname: user_name, sname: user_name});
 
 		}

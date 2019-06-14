@@ -1,9 +1,9 @@
-//nodejs function to get the history of a product by its id
+// nodejs function to get the history of a product by its id
 module.exports={
 func:function(supname1,pid1,utype,response){
 'use strict';
 
-//load required modules
+// load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
@@ -18,10 +18,10 @@ var pid=pid1;
 console.log("process.argv = " + supname1);
 
 // setup the fabric network
-//create a channel object
+// create a channel object
 var channel = fabric_client.newChannel('supplychannel');
 
-//find type of peer and return a peer object with appropriate url
+// find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -30,7 +30,7 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-//add the peer object to the channel object
+// add the peer object to the channel object
 channel.addPeer(peer);
 
 
@@ -61,9 +61,8 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		throw new Error('Failed to get '+user_name+'.... run registerUser.js');
 	}
 
-	// getHistoryByKey chaincode function - requires 1 integer argument
+	// creating request to call getHistoryByKey chaincode function - requires 1 integer argument
 	const request = {
-		//targets : --- letting this default to the peers assigned to the channel
 		chaincodeId: 'supplychain',
 		fcn: 'getHistoryByKey',
 		args: [pid]

@@ -1,8 +1,9 @@
-//nodejs program to add products for a supplier
+// nodejs program to add products for a supplier
 module.exports={
 func:function(supname,ptype1,pname1,pqty1,ploc1,utype,response){
 'use strict';
-//load required modules
+
+// load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
@@ -18,10 +19,10 @@ var ploc = ploc1;
 
 
 var fabric_client = new Fabric_Client();
-//create a channel object
+// create a channel object
 // setup the fabric network
 var channel = fabric_client.newChannel('supplychannel');
-//find type of peer and return a peer object with appropriate url
+// find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -30,12 +31,11 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-//add the peer object to the channel object
+// add the peer object to the channel object
 channel.addPeer(peer);
 var order = fabric_client.newOrderer('grpc://localhost:7050')
 channel.addOrderer(order);
 
-//
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
 console.log('Store path:'+store_path);
@@ -67,11 +67,8 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	tx_id = fabric_client.newTransactionID();
 	console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-	// createCar chaincode function - requires 5 args, ex: args: ['CAR12', 'Honda', 'Accord', 'Black', 'Tom'],
-	// changeCarOwner chaincode function - requires 2 args , ex: args: ['CAR10', 'Dave'],
-	// must send the proposal to endorsing peers
+	// creating request to call createProduct chaincode function - requires 6 arguments
 	var request = {
-		//targets: let default to the peer assigned to the client
 		chaincodeId: 'supplychain',
 		fcn: 'createProduct',
 		args: [ptype, pname, pqty, user_name, user_name, ploc],
@@ -116,9 +113,8 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		// is required bacause the event registration must be signed
 		let event_hub = channel.newChannelEventHub(peer);
 
-		// using resolve the promise so that result status may be processed
-		// under the then clause rather than having the catch clause process
-		// the status
+		// using resolve the promise so that result status may be processed under the then clause rather
+		// than having the catch clause process the status
 		let txPromise = new Promise((resolve, reject) => {
 			let handle = setTimeout(() => {
 				event_hub.unregisterTxEvent(transaction_id_string);
@@ -140,10 +136,10 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 					resolve(return_status);
 				}
 			}, (err) => {
-				//this is the callback if something goes wrong with the event registration or processing
+				// this is the callback if something goes wrong with the event registration or processing
 				reject(new Error('There was a problem with the eventhub ::'+err));
 			},
-				{disconnect: true} //disconnect when complete
+				{disconnect: true} // disconnect when complete
 			);
 			event_hub.connect();
 
@@ -166,14 +162,14 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	}
 
 	if(results && results[1] && results[1].event_status === 'VALID') {
-	
+
 		console.log('Successfully committed the change to the ledger by the peer');
 		     Product Id generated is ");
 	} else {
 		console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
 	}
 
-
+	// request to call queryProduct chaincode function to display the productId for the current product created
 	const req = {
 		chaincodeId: 'supplychain',
 		fcn: 'queryProduct',
@@ -182,14 +178,13 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	return channel.queryByChaincode(req);
 }).then((query_responses) => {
 		console.log("Query has completed, checking results");
-		// query_responses could have more than one  results if there multiple peers were used as targets
 		if (query_responses && query_responses.length == 1) {
 			if (query_responses[0] instanceof Error) {
 				console.error("error from query = ", query_responses[0]);
 			} else {
-				//console display
+				// console display
 				console.log(query_responses[0].toString());
-				//Display on web UI
+				// display on web UI
 				response.render('invoke.pug',{pid:query_responses[0].toString(), uname: user_name, ptype: ptype, pname: pname, pqty: pqty, ploc: ploc});
 
 			}
@@ -197,12 +192,10 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			console.log("No payloads were returned from query");
 		}
 
-
-
 }).catch((err) => {
 	console.error('Failed to invoke :: ' + err);
 	response.write('Failed to invoke :: ' + err);
-
 });
+
 }
 }

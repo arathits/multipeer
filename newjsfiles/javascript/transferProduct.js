@@ -1,4 +1,4 @@
-//nodejs function to tranfer some quantity of a product by one user to another
+// nodejs function to tranfer some quantity of a product by one user to another
 module.exports={
 func:function(supname1,pid1,supname2,qty,rloc,utype,response){
 'use strict';
@@ -71,7 +71,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	tx_id = fabric_client.newTransactionID();
 	console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-	// transferProduct chaincode function - requires 4 arguments
+	// creating request to call transferProduct chaincode function - requires 4 arguments
 	var request = {
 		chaincodeId: 'supplychain',
 		fcn: 'transferProduct',
@@ -168,7 +168,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	} else {
 		console.error('Failed to order the transaction. Error code: ' + results[0].status);
 	}
-	
+
 	//display result status to console
 	if(results && results[1] && results[1].event_status === 'VALID') {
 		console.log('Successfully committed the change to the ledger by the peer');
