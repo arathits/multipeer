@@ -1,21 +1,15 @@
+//nodejs function to query all product details and their owners
 module.exports={
 func:function(uname, utype, response){
 'use strict';
-/*
-* Copyright IBM Corp All Rights Reserved
-*
-* SPDX-License-Identifier: Apache-2.0
-*/
-/*
- * Chaincode query
- */
 
+//load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 var os = require('os');
 
-//
+
 var fabric_client = new Fabric_Client();
 
 var user_name = uname;
@@ -23,8 +17,9 @@ var user_type = utype;
 console.log("process.argv = " + user_name);
 
 // setup the fabric network
+//create a channel object
 var channel = fabric_client.newChannel('supplychannel');
-
+//find type of peer and return a peer object with appropriate url
 var peer;
 if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:8051');
@@ -33,7 +28,7 @@ if (user_type == 'distributer'){
 } else if (user_type == 'admin'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
-
+//add the peer object to the channel object
 channel.addPeer(peer);
 //init js file out
 
@@ -93,6 +88,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 			var arr2 = [];
 			arr = str.split(".");
 			for (var i = 0; i < arr.length-1; i++) {
+			        //Displaying the results on console
 				arr2 = arr[i].split(" ");
 				console.log("\tId = "+arr2[0]);
 				console.log("\tType = "+arr2[1]);
@@ -102,9 +98,9 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 				console.log("\tCurrent Owner = "+arr2[5]);
 				console.log("\tAddress = "+arr2[6]);
 			}
-			//console.log(query_responses[0].toString());
+			//Displaying in web UI
 			response.render('adminHome.pug', {queryresult: str, uname: user_name, sname: user_name});
-			//response.end(query_responses[0].toString());
+			
 		}
 	} else {
 		console.log("No payloads were returned from query");
