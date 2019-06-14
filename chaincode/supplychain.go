@@ -1,18 +1,23 @@
 package main
 
+//importing packages
+
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
 
+	// contains the definition for chaincode interface and chaincode stub
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	// contains the peer protobuf package
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
 type SmartContract struct {
 }
 
+// defining asset (product) attributes
 type Product struct {
 	Id string `json:"id"`
 	NextId string `json:"nextid"`
@@ -25,6 +30,7 @@ type Product struct {
 }
 
 func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
+	// called when chaincode receives instantiate transaction, initializing application state
 	return shim.Success(nil)
 }
 
@@ -55,9 +61,9 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 /****************************************INITIALIZE LEDGER****************************************/
 
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
+	// called during network setup to add first entry; for storing and retrieving the last id entered (to counter the unavailability of autoincrement option)
 
 	id := "0"
-
 	product := Product{Id: "0", NextId: "", Type: "", Name: "1", Quantity: "", Owner: "", CurrentOwner: "", Location: ""}
 	productAsBytes, _ := json.Marshal(product);
 	APIstub.PutState(id,productAsBytes)
@@ -68,6 +74,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 /****************************************QUERY PRODUCT****************************************/
 
 func (s *SmartContract) queryProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	// returns the id of the new last product in the database; expects only productId as argument
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -87,13 +94,12 @@ func (s *SmartContract) queryProduct(APIstub shim.ChaincodeStubInterface, args [
 	buffer.WriteString(prevId)
 
 	return shim.Success(buffer.Bytes())
-
-	//return shim.Success(prevId.Bytes())
 }
 
 /****************************************CREATE PRODUCT****************************************/
 
 func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	//adds a new product to the database; expects 6 arguments
 
 	if len(args) != 6 {
 		return shim.Error("Incorrect number of arguments. Expecting 5")
@@ -109,14 +115,17 @@ func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args 
 	var product = Product{Id: lastPid, NextId: id, Type: args[0], Name: args[1], Quantity: args[2], Owner: args[3], CurrentOwner: args[4], Location: args[5]}
 
 	productAsBytes, _ := json.Marshal(product)
+	// entering new product to the ledger using putstate method
 	APIstub.PutState(lastPid, productAsBytes)
 
+	// creates a composite key using product id and owner name
 	indexName := "owner~id"
 	ownerIdIndexKey, err := APIstub.CreateCompositeKey(indexName, []string{product.CurrentOwner, product.Id})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 	value := []byte{0x00}
+	// entering the composite key to the ledger using putstate method
 	APIstub.PutState(ownerIdIndexKey, value)
 
 	nextId,_ := strconv.Atoi(lastPid)
@@ -126,22 +135,18 @@ func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args 
 	newProductAsBytes, _ := json.Marshal(lastProduct)
 	APIstub.PutState(id,newProductAsBytes)
 
-	//var buffer bytes.Buffer
-	//buffer.WriteString(newId)
-
-	//return shim.Success(buffer.Bytes())
 	return shim.Success(nil)
 }
 
 /****************************************QUERY ALL PRODUCTS****************************************/
 
 func (s *SmartContract) queryAllProducts(APIstub shim.ChaincodeStubInterface) sc.Response {
+	//returns all entries in the database
 
 	startKey := "1"
 	endKey := "999"
 
-	fmt.Printf("\n\n\n\n")
-
+	// gets the details of all products in a range of key values using GetStateByRange method defined in shim package
 	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -152,13 +157,14 @@ func (s *SmartContract) queryAllProducts(APIstub shim.ChaincodeStubInterface) sc
 	var buffer bytes.Buffer
 
 	for resultsIterator.HasNext() {
+		//each record is retived to queryResponse
 		queryResponse, err := resultsIterator.Next()
 		if err != nil {
 			return shim.Error(err.Error())
 		}
 
-		// Record is a JSON object, so we write as-is
 		p := Product{}
+		//queryResponse is a Key-Value pair; Key is the productId and Value is a JSON array
 		err = json.Unmarshal(queryResponse.Value, &p)
 		if err != nil {
 			return shim.Error(err.Error())
@@ -171,9 +177,6 @@ func (s *SmartContract) queryAllProducts(APIstub shim.ChaincodeStubInterface) sc
 		thisCurrentOwner := p.CurrentOwner
 		thisLocation := p.Location
 
-		//buffer.WriteString("\"Record\":")
-		// Record is a JSON object, so we write as-is
-		//buffer.WriteString(string(queryResponse))
 		buffer.WriteString(string(thisId))
 		buffer.WriteString(" ")
 		buffer.WriteString(string(thisType))
@@ -191,19 +194,18 @@ func (s *SmartContract) queryAllProducts(APIstub shim.ChaincodeStubInterface) sc
 		buffer.WriteString(".")
 	}
 
-	fmt.Printf("- queryAllProducts:\n%s\n", buffer.String())
-
 	return shim.Success(buffer.Bytes())
 }
 
 /****************************************QUERY PRODUCT BY OWNER****************************************/
 
 func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
+	// returns products grouped by its current owner or actual owner
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
+	// GetStateByPartialCompositeKey returns an iterator over all composite keys whose prefix matches the given partial composite key
 	ownerResultsIterator, err := APIstub.GetStateByPartialCompositeKey("owner~id", []string{args[0]})
 	if err != nil {
 		return shim.Error(err.Error())
@@ -219,11 +221,12 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 			return shim.Error(err.Error())
 		}
 
+		// splits the ComposieKey into attributes from which key was formed
 		_, compositeKeyParts, err := APIstub.SplitCompositeKey(responseRange.Key)
 		if err != nil {
 			return shim.Error(err.Error())
 		}
-		//returnedColor := compositeKeyParts[0]
+
 		returnedId := compositeKeyParts[1]
 		thisProductAsBytes, err := APIstub.GetState(returnedId)
 
@@ -240,11 +243,8 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 		thisCurrentOwner := thisProduct.CurrentOwner
 		thisLocation := thisProduct.Location
 
-		//buffer.WriteString("\"Record\":")
-		// Record is a JSON object, so we write as-is
 		buffer.WriteString(strconv.Itoa(count))
 		buffer.WriteString(" ")
-		//buffer.WriteString(string(queryResponse))
 		buffer.WriteString(string(thisId))
 		buffer.WriteString(" ")
 		buffer.WriteString(string(thisType))
@@ -262,7 +262,6 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 		buffer.WriteString(".")
 		count++
 	}
-	fmt.Printf(buffer.String())
 
 	return shim.Success(buffer.Bytes())
 }
@@ -270,7 +269,8 @@ func (s *SmartContract) queryByOwner(APIstub shim.ChaincodeStubInterface, args [
 /****************************************TRANSFER PRODUCT****************************************/
 
 func (s *SmartContract) transferProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
+	// to transfer product from one user to another
+	// expects 4 arguments product id,transfer quantity,new owner and new location
 	if len(args) != 4 {
 		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
@@ -289,6 +289,7 @@ func (s *SmartContract) transferProduct(APIstub shim.ChaincodeStubInterface, arg
 
 	currQuantity,_ := strconv.Atoi(transferProd.Quantity)
 
+	// perform math checks to ensure that transfer quantity is less than total quantity and update the ledger with new data
 	if currQuantity >=transferQuantity {
 		currType := transferProd.Type
 		currName := transferProd.Name
@@ -301,7 +302,6 @@ func (s *SmartContract) transferProduct(APIstub shim.ChaincodeStubInterface, arg
 
 		newQuantity := strconv.Itoa(currQuantity-transferQuantity)
 		transferProd.Quantity = newQuantity
-		transferProd.Location = newLoc
 
 		newProductAsBytes, _ := json.Marshal(transferProd)
 		err = APIstub.PutState(productId,newProductAsBytes)
@@ -310,6 +310,7 @@ func (s *SmartContract) transferProduct(APIstub shim.ChaincodeStubInterface, arg
 			return shim.Error(err.Error())
 		}
 
+		// invokes CreateProduct method to add the product with changed owner into the database
 		response := s.createProduct(APIstub, []string{currType,currName,args[1],orgOwner,newOwner,newLoc})
 
 		if response.Status != shim.OK {
@@ -317,17 +318,17 @@ func (s *SmartContract) transferProduct(APIstub shim.ChaincodeStubInterface, arg
 		}
 
 		return shim.Success(nil)
+
 	} else {
 		return shim.Error("Transfer failed: transferQuantity not present")
 	}
 
 }
 
-
-
 /****************************************GET PRODUCT HISTORY****************************************/
 
 func (s *SmartContract) getHistoryByKey(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	// returns list of historical states; expects single argument - prodcutId
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
