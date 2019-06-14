@@ -1,7 +1,10 @@
+//nodejs program to get the total no of blocks and all its details
 module.exports={
 func:function func(uname, utype, response){
 
 'use strict';
+	
+//load required modules
 var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
@@ -18,6 +21,7 @@ var user_name = uname;
 console.log("process.argv = " + user_name);
 
 // setup the fabric network
+//create a channel object
 var channel = fabric_client.newChannel('supplychannel');
 var peer;
 if (user_type == 'distributer'){
@@ -28,8 +32,8 @@ if (user_type == 'distributer'){
 	peer = fabric_client.newPeer('grpc://localhost:7051');
 }
 
+//find type of peer and return a peer object with appropriate url
 channel.addPeer(peer);
-//init js file out
 
 var member_user = null;
 var store_path = path.join(__dirname, '../../hfc-key-store');
@@ -60,32 +64,34 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		response.write('Failed to get '+user_name+'.... run registerUser.js');
 	}
 
-	// send the query proposal to the peer
+	//query for various useful information on the state of the Channel (block height, known peers,etc)
 	return channel.queryInfo();
 }).then((blockinfo) => {
 	console.log("Query has completed, checking results");
-	// query_responses could have more than one results if there multiple peers were used as targets
+	// query_responses could have more than one results
 	if (blockinfo) {
 		if (blockinfo[0] instanceof Error) {
 			console.error("error from query = ", blockinfo[0]);
 		} else {
+			//get block height
 			console.log('Block Height='+blockinfo.height.low);
 			hgt = blockinfo.height.low.toString();
 			arr.length=hgt;
-			console.log("hello");
+			
 			var i;
+			//loop through array of promises, to call a function 
 			for(i=0;i<hgt;i++)
-			{
+			{	
   				promises.push(getBlock(i));
 			}
-			console.log("world");
 			console.log(arr);	
-
+			
+			//when all promises are resolved
 			Promise.all(promises)
     		.then(() => {
-				console.log("world");
-				console.log(arr);	
-	        response.render('dispblocks.pug',{uname: user_name, height: hgt, strs:arr.toString()});			
+				console.log(arr);
+				//render results to a pug file
+	        		response.render('dispblocks.pug',{uname: user_name, height: hgt, strs:arr.toString()});			
     		})
     		.catch((e) => {
         		console.log(err)
@@ -105,10 +111,10 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 //function to get each block's details
 var getBlock = function(bid){
 	return new Promise((resolve) => {
-	
+	//query the ledger for Block details by block number.
 	channel.queryBlock(bid).then((block) => {
 		var ans = calculateBlockHash(block.header);
-
+		
 		/*console.log("Block : ", block.header.number);
 		console.log("==========");
 		console.log("Current Hash : ",ans);
@@ -116,7 +122,8 @@ var getBlock = function(bid){
 		console.log("Data Hash : ", block.header.data_hash);
 		console.log('Transactions: ' + block.data.data.length);*/
 		str = "Block Number : " + block.header.number.toString() + "<br>Current Hash : " + ans.toString()+"<br>Previous Hash: "+block.header.previous_hash.toString()+"<br>Data Hash : "+block.header.data_hash.toString()+"<br>Transactions:"+ block.data.data.length.toString();
-			
+		
+		//append the details to array
 		arr[bid]=str;
 		console.log(bid);
 		// check the results
@@ -133,6 +140,7 @@ var getBlock = function(bid){
 
 
 //function to get current block's hash
+//required modules
 var sha = require('js-sha256');
 var asn = require('asn1.js');
 var calculateBlockHash = function(header) {
@@ -143,7 +151,7 @@ var calculateBlockHash = function(header) {
      this.key('DataHash').octstr()
    );
  });
-
+//find current block hash
   let output = headerAsn.encode({
       Number: parseInt(header.number),
       PreviousHash: Buffer.from(header.previous_hash, 'hex'),
