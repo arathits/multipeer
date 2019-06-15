@@ -164,7 +164,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	if(results && results[1] && results[1].event_status === 'VALID') {
 
 		console.log('Successfully committed the change to the ledger by the peer');
-		     Product Id generated is ");
+		     
 	} else {
 		console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
 	}
