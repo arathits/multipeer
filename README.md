@@ -82,6 +82,8 @@ The application development include 3 steps
 	Webpage UI pug templates are stored in ./newjsfiles/views
 	Back-end nodejs files are stores in ./newjsfiles/javascript
 
+	Run `npm install` from multipeer folder. It takes package.json file as input and package-lock.json file is created.
+
 	To run the application, run following in terminal:
 		- `cd newjsfiles/javascript`
 		- `node enrollAdmin`
